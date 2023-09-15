@@ -12,7 +12,6 @@ Currently the app only checks for simple row, column or subgrid inconsistency wh
 
 The next improvements that make sense to implement are for instance:
 
- - row, column and 3x3 insufficiency ([read more](https://sandiway.arizona.edu/sudoku/insufficiency.html))
  - row, column and 3x3 cover elemination ([read more](https://sandiway.arizona.edu/sudoku/cover.html))
  - smarter cell selection: when choosing the next cell to fill, prefer the one with the least candidates
  - other tricks one might use when solving a sudoku puzzle manually
