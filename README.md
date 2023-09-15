@@ -20,5 +20,5 @@ The next improvements that make sense to implement are for instance:
 ## Resources
 
 - "Algorithmen und Datenstrukturen: Vorlesungsskript", Benjamin Blankertz und Vera Röhr (Fachgebiet Neurotechnologie, TU Berlin)
-- [Sudoku Sandiway](https://sandiway.arizona.edu/sudoku/), Sandiway Fong (Department of Linguistics and Department of Computer Science University of Arizona)
+- [Sudoku Sandiway](https://sandiway.arizona.edu/sudoku/), Sandiway Fong (Department of Linguistics and Department of Computer Science, University of Arizona)
   - input puzzle sourced from [here](https://sandiway.arizona.edu/sudoku/examples.html)
