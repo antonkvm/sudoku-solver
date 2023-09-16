@@ -3,7 +3,9 @@ class SudokuGrid:
 	def __init__(self, input: str) -> None:
 		self.verify_input(input)
 		self.grid = self.build_puzzle(input)
+		self.validate_grid()
 		self.steps = 0
+		print("Init complete.\n")
 
 	def __str__(self) -> str:
 		pretty = ""
@@ -13,8 +15,8 @@ class SudokuGrid:
 			pretty += "\n"
 		return pretty
 
-	# TODO: check validity in terms of sudoku rules
 	def verify_input(self, input: str):
+		'''Raises an error if the input string is invalid in terms of type, length, or if it has non-digit elements.'''
 		print("Verifying input...")
 		if input == None:
 			raise TypeError("Missing mandatory parameter: input string")
@@ -27,33 +29,29 @@ class SudokuGrid:
 		else:
 			print("All checks passed.")
 	
-	# TODO work this into the constructor, raise errors
-	def validate(self) -> bool:
-		'''Returns true if the grid is valid in terms of the sudoku rules.'''
+	def validate_grid(self):
+		'''Raises an error if the grid is invalid in terms of the sudoku rules.'''
 		print("Checking grid validity in terms of sudoku rules...")
-		res = True
-		for row in range(9):
-			for col in range(9):
-				cell_val = self.grid[row][col]
-				if cell_val != 0:
-					for i in range(9):
-						if i != col and self.grid[row][i] == cell_val:
-							res = False
-						if i != row and self.grid[i][col] == cell_val:
-							res = False
-						check_row = row // 3 * 3 + i // 3
-						check_col = col // 3 * 3 + i // 3
-						if row != check_row and col != check_col and self.grid[check_row][check_col] == cell_val:
-							res = False
-		if res == True:
-			print("Grid is valid.")
-			return res
-		else:
-			print("Grid is invalid.")
-			return res
+		def has_duplicates(l: list[int]) -> bool:
+			seen = set()
+			for val in l:
+				if val == 0:
+					continue
+				elif val not in seen:
+					seen.add(val)
+				else:
+					raise ValueError("Grid is invalid because a duplicate was found in a row, column, or 3x3 subgrid.")
+		for i in range(9):
+			has_duplicates(self.grid[i])
+			has_duplicates([row[i] for row in self.grid])
+			subgrid_values = []
+			for j in range(9):
+				row = (i // 3 * 3) + (j // 3)
+				col = (i % 3 * 3) + (j % 3)
+				subgrid_values.append(self.grid[row][col])
+			has_duplicates(subgrid_values)
+		print("Grid is valid.")
 				
-				
-	
 	def build_puzzle(self, input: str) -> list[list[int]]:
 		print("Building sudoku puzzle from input...")
 		puzzle = []
