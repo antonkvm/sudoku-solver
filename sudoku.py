@@ -1,9 +1,19 @@
-class SudokuGrid:
+from typing import Callable
 
+
+class Cell:
+	def __init__(self, val: int, row: int, col: int) -> None:
+		self.val = val
+		self.row = row
+		self.col = col
+		self.candidates: set[int] = set()
+
+class SudokuGrid:
 	def __init__(self, input: str) -> None:
 		self.verify_input(input)
-		self.grid = self.build_puzzle(input)
+		self.grid = self.build_grid(input)
 		self.validate_grid()
+		self.calculate_all_candidates()
 		self.steps = 0
 		print("Init complete.\n")
 
@@ -11,7 +21,7 @@ class SudokuGrid:
 		pretty = ""
 		for row in self.grid:
 			for col in row:
-				pretty += str(col) + " "
+				pretty += str(col.val) + " "
 			pretty += "\n"
 		return pretty
 
@@ -32,9 +42,10 @@ class SudokuGrid:
 	def validate_grid(self):
 		'''Raises an error if the grid is invalid in terms of the sudoku rules.'''
 		print("Checking grid validity in terms of sudoku rules...")
-		def has_duplicates(l: list[int]) -> bool:
+		def has_duplicates(list_of_cells: list[Cell]) -> bool:
 			seen = set()
-			for val in l:
+			values = [cell.val for cell in list_of_cells]
+			for val in values:
 				if val == 0:
 					continue
 				elif val not in seen:
@@ -51,61 +62,112 @@ class SudokuGrid:
 				subgrid_values.append(self.grid[row][col])
 			has_duplicates(subgrid_values)
 		print("Grid is valid.")
-				
-	def build_puzzle(self, input: str) -> list[list[int]]:
-		print("Building sudoku puzzle from input...")
-		puzzle = []
+	
+	# TODO: Every place where a cell is accessed needs to be updated!
+	def build_grid(self, input: str) -> list[list[Cell]]:
+		print("Building sudoku puzzle grid from input...")
+		puzzle: list[list[Cell]] = []
 		for i in range(0, len(input), 9):
-			row = [int(c) for c in input[i:i+9]]
+			row: list[Cell] = []
+			for j in range(i, i + 9):
+				row.append(Cell(val=int(input[j]), row=i//9, col=j%9))
 			puzzle.append(row)
+			# row = [Cell(int(c)) for c in input[i:i+9]]
+			# puzzle.append(row)
 		print("Build successful.")
 		return puzzle
 	
-	def find_empty_cell(self) -> tuple[int, int]:
-		'''Find the first empty cell.'''
+	def find_empty_cell(self) -> Cell | None:
+		'''Returns the first empty cell with the fewest candidates. Will return None if no empty cells are left, meaning the puzzle is solved.'''
+		cell_with_fewest_candidates = None
+		lowest_candidate_count = 10
 		for row in range(9):
 			for col in range(9):
-				if self.grid[row][col] == 0:
-					return (row, col)
-		# fallback for when puzzle is solved:
-		return None
+				cell = self.grid[row][col]
+				if cell.val == 0:
+					cell_candidate_count = len(cell.candidates)
+					if cell_candidate_count < lowest_candidate_count:
+						cell_with_fewest_candidates = cell
+						lowest_candidate_count = cell_candidate_count
+		return cell_with_fewest_candidates
 	
-	def find_candidates(self, row: int, col: int) -> list[int]:
-		'''Returns a list of candidates for a given cell.'''
+	def calculate_all_candidates(self):
+		'''Fills in the candidates for all empty cells.'''
+		print("Filling in candidates for all empty cells...")
+		for row in range(9):
+			for col in range(9):
+				cell = self.grid[row][col]
+				if cell.val == 0:
+					candidates = self.find_candidates(row, col)
+					cell.candidates.update(candidates)
+		print("Done, all empty cells have their candidates filled in.")
+	
+	def find_candidates(self, row: int, col: int) -> set[int]:
+		'''Returns a set of candidates for a given cell.'''
 		candidates = set(range(1, 10))
 		# check row and column:
 		for i in range(9):
-			candidates.discard(self.grid[row][i])
-			candidates.discard(self.grid[i][col])
+			candidates.discard(self.grid[row][i].val)
+			candidates.discard(self.grid[i][col].val)
 		# check 3x3 subgrid:
 		subgrid_start_row = row // 3 * 3
 		subgrid_start_col = col // 3 * 3
 		for r in range(subgrid_start_row, subgrid_start_row + 3):
 			for c in range(subgrid_start_col, subgrid_start_col + 3):
-				candidates.discard(self.grid[r][c])
+				candidates.discard(self.grid[r][c].val)
 		return candidates
 	
-	def reset_cell(self, row, col):
-		'''Resets a cell to zero.'''
-		self.grid[row][col] = 0
+	def get_connected_cells(self, cell: Cell) -> set[Cell]:
+		'''Returns a set containing all connected empty cells. Connected means in the same row, column, or 3x3 subgrid.'''
+		cells: set[Cell] = set()
+		row = cell.row
+		col = cell.col
+		for i in range(9):
+			cells.add(self.grid[row][i])
+			cells.add(self.grid[i][col])
+		subgrid_start_row = row // 3 * 3
+		subgrid_start_col = col // 3 * 3
+		for r in range(subgrid_start_row, subgrid_start_row + 3):
+			for c in range(subgrid_start_col, subgrid_start_col + 3):
+				cells.add(self.grid[r][c])
+		cells.remove(cell)
+		cells = filter(lambda cell : cell.val == 0, cells)
+		return set(cells)
+	
+	def map_connected_cells(self, cell: Cell, apply: Callable[[Cell], None]) -> None:
+		'''Goes through all cells that are connected to the passed cell and applies a function to them.'''
+		connected = self.get_connected_cells(cell)
+		for c in connected:
+			apply(c)
+	
+	def get_connected_cells_with_candidate(self, cell: Cell, candidate: int) -> set[Cell]:
+		'''Returns a set of connected empty cells that have the passed candidate in their candidate set.'''
+		connected = self.get_connected_cells(cell)
+		return set(filter(lambda cell : candidate in cell.candidates, connected))
 
 	def backtrack(self) -> bool:
-		empty_cell = self.find_empty_cell()
-		if empty_cell is not None:
-			row, col = empty_cell
-			candidates = self.find_candidates(row, col)
-			for c in candidates:
-				self.grid[row][col] = c
+		target_cell = self.find_empty_cell()
+		if target_cell is not None:
+			for c in target_cell.candidates:
+				target_cell.val = c
+				connected_and_has_candidate = self.get_connected_cells_with_candidate(target_cell, c)
+				for cell in connected_and_has_candidate:
+					cell.candidates.discard(c)
 				self.steps += 1
 				if self.backtrack() == True:
 					return True
-			self.reset_cell(row, col)
+				# probably something wrong here:
+				for cell in connected_and_has_candidate:
+					cell.candidates.add(c)
+			target_cell.val = 0
 		else:
 			return True
 	
 	def solve(self):
 		print("Solving puzzle...")
 		if self.backtrack() == True:
+			print("Found solution!")
+			self.validate_grid()
 			print(f"Puzzle solved in {self.steps} steps.")
 		else:
 			print("Unable to solve puzzle :(")
