@@ -63,7 +63,6 @@ class SudokuGrid:
 			has_duplicates(subgrid_values)
 		print("Grid is valid.")
 	
-	# TODO: Every place where a cell is accessed needs to be updated!
 	def build_grid(self, input: str) -> list[list[Cell]]:
 		print("Building sudoku puzzle grid from input...")
 		puzzle: list[list[Cell]] = []
@@ -72,8 +71,6 @@ class SudokuGrid:
 			for j in range(i, i + 9):
 				row.append(Cell(val=int(input[j]), row=i//9, col=j%9))
 			puzzle.append(row)
-			# row = [Cell(int(c)) for c in input[i:i+9]]
-			# puzzle.append(row)
 		print("Build successful.")
 		return puzzle
 	
