@@ -2,7 +2,7 @@ from sudoku import SudokuGrid
 import puzzles
 
 if __name__ == "__main__":
-	sudoku = SudokuGrid(puzzles.HARD)
+	sudoku = SudokuGrid(puzzles.SKIENA_HARD)
 	# invalid = SudokuGrid(puzzles.INVALID)
 	sudoku.solve()
-	print(sudoku)
+	# print(sudoku)
