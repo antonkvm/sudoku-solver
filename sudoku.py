@@ -18,13 +18,22 @@ class SudokuGrid:
 		print("Init complete.\n")
 
 	def __str__(self) -> str:
+		'''Prints the grid in a single line string.'''
+		string = ""
+		for row in self.grid:
+			for cell in row:
+				string += str(cell.val)
+		return string
+	
+	def pretty_print(self) -> None:
+		'''Prints the grid in a pretty way.'''
 		pretty = ""
 		for row in self.grid:
 			for col in row:
 				pretty += str(col.val) + " "
 			pretty += "\n"
-		return pretty
-
+		print(pretty)
+	
 	def verify_input(self, input: str):
 		'''Raises an error if the input string is invalid in terms of type, length, or if it has non-digit elements.'''
 		print("Verifying input...")
@@ -136,6 +145,7 @@ class SudokuGrid:
 		connected = self.get_connected_cells(cell)
 		return set(filter(lambda cell : candidate in cell.candidates, connected))
 
+	# TODO: I feel like this could be prettier
 	def backtrack(self) -> bool:
 		target_cell = self.find_empty_cell()
 		if target_cell is not None:
