@@ -72,6 +72,7 @@ class SudokuGrid:
 			has_duplicates(subgrid_values)
 		print("Grid is valid.")
 	
+	# TODO: having this grid and also storing the row/col in the cell object is kinda redundant.
 	def build_grid(self, input: str) -> list[list[Cell]]:
 		print("Building sudoku puzzle grid from input...")
 		puzzle: list[list[Cell]] = []
@@ -83,8 +84,9 @@ class SudokuGrid:
 		print("Build successful.")
 		return puzzle
 	
+	# TODO:
 	def find_empty_cell(self) -> Cell | None:
-		'''Returns the first empty cell with the fewest candidates. Will return None if no empty cells are left, meaning the puzzle is solved.'''
+		'''Returns the first empty cell with the fewest candidates. Might return a candidateless empty cell. Will return None if no empty cells are left, meaning the puzzle is solved.'''
 		cell_with_fewest_candidates = None
 		lowest_candidate_count = 10
 		for row in range(9):
@@ -144,20 +146,31 @@ class SudokuGrid:
 		'''Returns a set of connected empty cells that have the passed candidate in their candidate set.'''
 		connected = self.get_connected_cells(cell)
 		return set(filter(lambda cell : candidate in cell.candidates, connected))
+	
+	def has_candidateless_cell(self, set_of_cells: set[Cell]) -> bool:
+		'''Returns true if a passed set of cells contains at least one empty cell with no candidates.'''
+		for cell in set_of_cells:
+			if cell.val == 0 and len(cell.candidates) == 0:
+				return True
+		return False
 
 	# TODO: I feel like this could be prettier
 	def backtrack(self) -> bool:
 		target_cell = self.find_empty_cell()
 		if target_cell is not None:
 			for c in target_cell.candidates:
-				target_cell.val = c
-				connected_and_has_candidate = self.get_connected_cells_with_candidate(target_cell, c)
-				for cell in connected_and_has_candidate:
+				propagation_targets = self.get_connected_cells_with_candidate(target_cell, c)
+				for cell in propagation_targets:
 					cell.candidates.discard(c)
+				if self.has_candidateless_cell(propagation_targets):
+					for cell in propagation_targets:
+						cell.candidates.add(c)
+					continue
+				target_cell.val = c
 				self.steps += 1
 				if self.backtrack() == True:
 					return True
-				for cell in connected_and_has_candidate:
+				for cell in propagation_targets:
 					cell.candidates.add(c)
 			target_cell.val = 0
 		else:
