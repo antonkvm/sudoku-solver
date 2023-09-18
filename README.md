@@ -12,11 +12,22 @@ Currently the app implements the following heuristics:
 
 ## Performance
 
-The app currently solves this puzzle of hard difficulty in 33041 steps.
+The app solves these puzzles (from `puzzles.py`) with this performace:
 
-![skiena_hard_puzzle](skiena_hard_puzzle.png)
+- easy1: 45 steps for 45 empty cells
+- easy2: 45 steps for 45 empty cells
+- intermediate: 421 steps for 57 empty cells 
+- difficult1: 5995 steps for 58 empty cells
+- difficult2: 117 steps for 47 empty cells
+- notfun: 1369 steps for 62 empty cells
+- skiena_hard: 33041 steps for 64 empty cells
 
-**Puzzle source:**
+Notice that for the easy puzzles, the algorithm never made a single wrong choice for a cell and never had to backtrack. It's also evident that the difficulty of a puzzle is not just dependent on the number of empty cells, as the puzzle 'notfun' was solved faster than 'difficult1', even though it has more empty cells.
+
+## Puzzle sources
+
+Fong, S., _Example Puzzles and Solutions_. Sudoku Sandiway. Retrieved September 18, 2023, from https://sandiway.arizona.edu/sudoku/examples.html
+
 Skiena, S. S. (2008). _The Algorithm Design Manual._ Springer Science & Business Media, 2 edition.
 
 ## Next steps
@@ -35,6 +46,5 @@ The next improvements that make sense to implement are for instance:
 
 ## Resources
 
-- "Algorithmen und Datenstrukturen: Vorlesungsskript", Benjamin Blankertz und Vera Röhr (Fachgebiet Neurotechnologie, TU Berlin)
-- [Sudoku Sandiway](https://sandiway.arizona.edu/sudoku/), Sandiway Fong (Department of Linguistics and Department of Computer Science, University of Arizona)
-  - input puzzle 'easy' sourced from [here](https://sandiway.arizona.edu/sudoku/examples.html)
+- Blankertz, B. & Röhr, V., _Algorithmen und Datenstrukturen: Vorlesungsskript_. TU Berlin, Fachgebiet Neurotechnologie.
+- Fong, S., _Heuristics_. Sudoku Sandiway. Retrieved September 16, 2023, from https://sandiway.arizona.edu/sudoku/index.html#heuristics
