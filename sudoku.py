@@ -131,12 +131,6 @@ class SudokuGrid:
 		cells = filter(lambda cell : cell.val == 0, cells)
 		return set(cells)
 	
-	def map_connected_cells(self, cell: Cell, apply: Callable[[Cell], None]) -> None:
-		'''Goes through all cells that are connected to the passed cell and applies a function to them.'''
-		connected = self.get_connected_cells(cell)
-		for c in connected:
-			apply(c)
-	
 	def get_connected_cells_with_candidate(self, cell: Cell, candidate: int) -> set[Cell]:
 		'''Returns a set of connected empty cells that have the passed candidate in their candidate set.'''
 		connected = self.get_connected_cells(cell)
