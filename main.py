@@ -5,4 +5,3 @@ if __name__ == "__main__":
 	sudoku = SudokuGrid(puzzles.SKIENA_HARD)
 	# invalid = SudokuGrid(puzzles.INVALID)
 	sudoku.solve()
-	# print(sudoku)
