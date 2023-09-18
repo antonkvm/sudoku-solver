@@ -157,7 +157,6 @@ class SudokuGrid:
 				self.steps += 1
 				if self.backtrack() == True:
 					return True
-				# probably something wrong here:
 				for cell in connected_and_has_candidate:
 					cell.candidates.add(c)
 			target_cell.val = 0
