@@ -154,23 +154,40 @@ class SudokuGrid:
 		print(f"Took {self.steps} steps.")
 		return True
 	
+	def sort_candidates(self, cell: Cell) -> list[int]:
+		'''Returns a list of candidate integers that is sorted by the number of cells that would have their candidate sets affected through constraint propagation if that candidate is chosen. In other words, the first candidate in the returned list is the candidate that will affect the fewest other cell candidate sets. Used for LCV heuristic.'''
+		candidates = cell.candidates
+		candidates = list(candidates)
+		candidates.sort(key=lambda c : len(self.get_propagation_targets(cell, c)))
+		return candidates
+
 	def backtrack(self):
+		# exit condition:
 		if not self.solution_found():
+			# select most constrained cell with (Minimum Remaining Value):
 			target_cell = self.find_empty_cell()
-			for c in target_cell.candidates:
+			# sort candidates by impact on other cells (Least Constricting Value):
+			sorted_candidates = self.sort_candidates(target_cell)
+			for c in sorted_candidates:
 				propagation_targets = self.get_propagation_targets(target_cell, c)
+				# look-ahead candidate selection:
 				if {c} in [pt.candidates for pt in propagation_targets]:
 					continue
+				# constraint propagation:
 				for pt in propagation_targets:
 					pt.candidates.discard(c)
+				# execute step:
 				target_cell.val = c
 				self.steps += 1
+				# go to next step:
 				if self.backtrack():
 					return True
+				# undo step:
 				target_cell.val = 0
 				for pt in propagation_targets:
 					pt.candidates.add(c)
 		else:
+			# solution found:
 			return True
 
 	def solve(self):

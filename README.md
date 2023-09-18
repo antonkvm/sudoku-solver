@@ -11,26 +11,37 @@ Currently the app implements the following heuristics:
   - prefer the cells with the fewest remaining candidates (i.e. the most constrained cells), reducing the chance of picking a wrong value
 - Constraint Propagation:
   - entering a value into a cell removes that value from the candidate sets of connected cells
-  - facilitates the effectiveness of MRV
-- Look-ahead candidate selection:
+  - boosts effectiveness of MRV
+- Look-Ahead Candidate Selection:
   - skip a candidate for a cell if choosing that value would cause another cell to have an empty candidate set through constraint propagation
   - that candidate is hopeless because eventually, we would encounter that other candidateless cell and would have to backtrack
+- Least Constraining Value (LCV)
+  - prefer the candidate for a cell that impacts the fewest candidate sets of other connected cells through constraint propagation, reducing the chance of eliminating a correct candidate
 
 ## Performance
 
-The app solves these puzzles (from `puzzles.py`) with this performace:
+The app currently solves these puzzles (from `puzzles.py`) with this performace:
 
 - easy1: 45 steps for 45 empty cells
 - easy2: 45 steps for 45 empty cells
-- intermediate: 384 steps for 57 empty cells 
-- difficult1: 5559 steps for 58 empty cells
-- difficult2: 113 steps for 47 empty cells
-- notfun: 1230 steps for 62 empty cells
-- skiena_hard: 27211 steps for 64 empty cells
+- intermediate: 834 steps for 57 empty cells 
+- difficult1: 2279 steps for 58 empty cells
+- difficult2: 76 steps for 47 empty cells
+- notfun: 3330 steps for 62 empty cells
+- skiena_hard: 8522 for 64 empty cells
 
-A step is defined as entering a value into a cell and then moving on to the next cell.
+> A step is defined as entering a value into a cell and then moving on to the next cell.
 
-Notice that for the easy puzzles, the algorithm never made a single wrong choice for a cell and never had to backtrack. It's also evident that the difficulty of a puzzle is not just dependent on the number of empty cells, as the puzzle 'notfun' was solved faster than 'difficult1', even though it has more empty cells.
+Notice that for the easy puzzles, the algorithm never made a single wrong choice for a cell and never had to backtrack.
+
+## Optimization anomaly
+
+The performance generally improved when I added new heuristics and optimizations, but interestingly, adding the Least Constraining Value Heuristic resulted in both better and worse performace, depending on the input puzzle.
+
+| Optimization                | intermediate | difficult2 | notfun | skiena_hard |
+|-----------------------------|:------------:|:----------:|:------:|:-----------:|
+| Before adding LCV heuristic |      384     |     113    |  1230  |    27211    |
+| After adding LCV heuristic  |      834     |     76     |  3330  |     8522    |
 
 ## Puzzle sources
 
@@ -42,9 +53,8 @@ Skiena, S. S. (2008). _The Algorithm Design Manual._ Springer Science & Business
 
 The next improvements that make sense to implement are for instance:
 
- - row, column and 3x3 cover elemination ([read more](https://sandiway.arizona.edu/sudoku/cover.html))
- - Least Constraining Value (LCV): select the candidate for a cell that impacts the fewest candidate sets of connected cells, reducing the chance of eliminating a correct candidate
- - Other various tricks one might use when solving a sudoku puzzle manually
+ - Various techniques one might use when solving a sudoku puzzle manually, like cover elimination or pointing pairs. These could help eliminate candidates and shave off a few steps.
+ - maybe do something "fun" like add a front end and a website
 
 ## Resources
 
