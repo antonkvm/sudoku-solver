@@ -144,7 +144,7 @@ class SudokuGrid:
 		return set(filter(lambda cell : candidate in cell.candidates, connected))
 	
 	def solution_found(self) -> True:
-		'''Returns true if the grid contains no empty cells.'''
+		'''Returns True if the grid contains no empty cells and no sudoku rules are broken.'''
 		for row in self.grid:
 			for cell in row:
 				if cell.val == 0:
@@ -166,7 +166,7 @@ class SudokuGrid:
 		if not self.solution_found():
 			# select most constrained cell with (Minimum Remaining Value):
 			target_cell = self.find_empty_cell()
-			# sort candidates by impact on other cells (Least Constricting Value):
+			# sort candidates by impact on other cells (Least Constraining Value):
 			sorted_candidates = self.sort_candidates(target_cell)
 			for c in sorted_candidates:
 				propagation_targets = self.get_propagation_targets(target_cell, c)
