@@ -13,8 +13,8 @@ Currently the app implements the following heuristics:
   - entering a value into a cell removes that value from the candidate sets of connected cells
   - boosts effectiveness of MRV
 - Look-Ahead Candidate Selection:
-  - skip a candidate for a cell if choosing that value would cause another cell to have an empty candidate set through constraint propagation
-  - that candidate is hopeless because eventually, we would encounter that other candidateless cell and would have to backtrack
+  - skip a candidate for a cell if choosing that value would cause another cell to be left with no candidates through constraint propagation
+  - a cell with no candidates is a definite indication that a partial solution is wrong, meaning that branch can be pruned
 - Least Constraining Value (LCV)
   - prefer the candidate for a cell that impacts the fewest candidate sets of other connected cells through constraint propagation, reducing the chance of eliminating a correct candidate
 
@@ -34,9 +34,9 @@ The app currently solves these puzzles (from `puzzles.py`) with this performace:
 
 Notice that for the easy puzzles, the algorithm never made a single wrong choice for a cell and never had to backtrack.
 
-## Optimization anomaly
+## Heuristic trade-off
 
-The performance generally improved when I added new heuristics and optimizations, but interestingly, adding the Least Constraining Value Heuristic resulted in both better and worse performace, depending on the input puzzle.
+The performance generally improved when I added new heuristics and optimizations, but interestingly, adding the Least Constraining Value Heuristic resulted in both better and worse performace, depending on the input puzzle. This shows that implementing a new heuristic is not a guaranteed improvement for every input, but rather just increases the chance of improvement.
 
 | Optimization                | intermediate | difficult2 | notfun | skiena_hard |
 |-----------------------------|:------------:|:----------:|:------:|:-----------:|
@@ -48,12 +48,9 @@ The performance generally improved when I added new heuristics and optimizations
 - Fong, S., _Example Puzzles and Solutions_. Sudoku Sandiway. Retrieved September 18, 2023, from https://sandiway.arizona.edu/sudoku/examples.html
 - Skiena, S. S. (2008). _The Algorithm Design Manual._ Springer Science & Business Media, 2 edition.
 
-## Next steps
+## A different approach?
 
-The next improvements that make sense to implement are for instance:
-
- - Various techniques one might use when solving a sudoku puzzle manually, like cover elimination or pointing pairs. These could help eliminate candidates and shave off a few steps.
- - maybe do something "fun" like add a front end and a website
+Backtracking is – while definitely effective – a somewhat 'dumb' way of solving a sudoku puzzle, because it's basically just trial and error with some optimizations. Because most puzzles are solveable by humans, their solution can be deduced by repeatedly eliminating cell candidates using different techniques (like hidden pairs, pointing pairs, etc) until we find an definite solution for every cell. This is a more elegant approach, which is why I think it would be smart to implement these constraint propagation methods for eliminating candidates as a primary solving agent, while demoting the brute-force backtracking appraoch to  a fallback method, for when candidate elimination hits a dead end.
 
 ## Resources
 
