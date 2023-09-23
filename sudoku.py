@@ -26,10 +26,21 @@ class SudokuGrid:
 	def pretty_print(self) -> None:
 		'''Prints the grid in a pretty way.'''
 		pretty = ""
-		for row in self.grid:
-			for col in row:
-				pretty += str(col.val) + " "
-			pretty += "\n"
+		for i in range(9):
+			for j in range(9):
+				cell = self.grid[i][j].val
+				if cell != 0:
+					pretty += str(cell)
+				else:
+					pretty += "."
+				if j != 8:
+					pretty += " "
+				else:
+					pretty += "\n"
+				if j == 2 or j == 5:
+					pretty += "| "
+			if i == 2 or i == 5:
+				pretty += "------|-------|------\n"
 		print(pretty)
 	
 	def verify_input(self, input: str):
