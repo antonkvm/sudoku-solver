@@ -15,6 +15,7 @@ Currently the app implements the following heuristics:
 - Look-Ahead Candidate Selection:
   - skip a candidate for a cell if choosing that value would cause another cell to be left with no candidates through constraint propagation
   - a cell with no candidates is a definite indication that a partial solution is wrong, meaning that branch can be pruned
+  - Propably nullified by MRV, see explanation [here](#conflicting-heuristics).
 - Least Constraining Value (LCV)
   - prefer the candidate for a cell that impacts the fewest candidate sets of other connected cells through constraint propagation, reducing the chance of eliminating a correct candidate
 
@@ -48,9 +49,15 @@ The performance generally improved when I added new heuristics and optimizations
 - Fong, S., _Example Puzzles and Solutions_. Sudoku Sandiway. Retrieved September 18, 2023, from https://sandiway.arizona.edu/sudoku/examples.html
 - Skiena, S. S. (2008). _The Algorithm Design Manual._ Springer Science & Business Media, 2 edition.
 
+## Conflicting Heuristics
+
+I would argue that the MRV heuristic nullifies any effect the Look-Ahead Candidated Selection heuristic would have, for the following reason:
+
+Look-Ahead Candidate Selection skips a candidate for a cell (A), if choosing it would cause a seperate cell (B) to be left with no candidates, because there is no way that a solution can be found for that case. But in this scenario, cell A has more candidates than cell B — meaning MRV would have selected cell B before cell A anyway and Look-Ahead Candidate Selection would never take effect.
+
 ## A different approach?
 
-Backtracking is – while definitely effective – a somewhat 'dumb' way of solving a sudoku puzzle, because it's basically just trial and error with some optimizations. Because most puzzles are solveable by humans, their solution can be deduced by repeatedly eliminating cell candidates using different techniques (like hidden pairs, pointing pairs, etc) until we find an definite solution for every cell. This is a more elegant approach, which is why I think it would be smart to implement these constraint propagation methods for eliminating candidates as a primary solving agent, while demoting the brute-force backtracking appraoch to  a fallback method, for when candidate elimination hits a dead end.
+Backtracking is – while definitely effective – a somewhat 'dumb' way of solving a sudoku puzzle, because it's basically just trial and error with some optimizations. Because most puzzles are solveable by humans, their solution can be deduced by repeatedly eliminating cell candidates using different techniques (like hidden pairs, pointing pairs, etc) until we find an definite solution for every cell. This is a more elegant approach, which is why I think it would be smart to implement these constraint propagation methods for eliminating candidates as a primary solving agent, while demoting the brute-force backtracking appraoch to a fallback method, for when candidate elimination hits a dead end.
 
 ## Resources
 
