@@ -6,6 +6,11 @@ class Cell:
         self.candidates: set[int] = set()
 
 
+def has_duplicates(cells: list[Cell]) -> bool:
+    filled_cells = [c for c in cells if c.val != 0]
+    return len(filled_cells) != len(set(filled_cells))
+
+
 class SudokuGrid:
     def __init__(self, input: str) -> None:
         self.verify_input(input)
@@ -61,26 +66,22 @@ class SudokuGrid:
         """Raises an error if the grid is invalid in terms of the sudoku rules."""
         print('Checking grid validity in terms of sudoku rules...')
 
-        def has_duplicates(list_of_cells: list[Cell]) -> bool:
-            seen = set()
-            values = [cell.val for cell in list_of_cells]
-            for val in values:
-                if val == 0:
-                    continue
-                elif val not in seen:
-                    seen.add(val)
-                else:
-                    raise ValueError('Grid is invalid because a duplicate was found in a row, column, or 3x3 subgrid.')
-
         for i in range(9):
-            has_duplicates(self.grid[i])
-            has_duplicates([row[i] for row in self.grid])
-            subgrid_values = []
+            row = self.grid[i]
+            col = [row[i] for row in self.grid]
+            subgrid = []
             for j in range(9):
                 row = (i // 3 * 3) + (j // 3)
                 col = (i % 3 * 3) + (j % 3)
-                subgrid_values.append(self.grid[row][col])
-            has_duplicates(subgrid_values)
+                subgrid.append(self.grid[row][col])
+
+            if has_duplicates(row):
+                raise ValueError(f'Grid is invalid because row {i+1} (from the top) has a duplicate.')
+            if has_duplicates(col):
+                raise ValueError(f'Grid is invalid because column {i+1} (from the left) has a duplicate.')
+            if has_duplicates(subgrid):
+                raise ValueError(f'Grid is invalid because subgrid {i+1} () has a duplicate.')
+
         print('Grid is valid.')
 
     # TODO: having this grid and also storing the row/col in the cell object is kinda redundant.
