@@ -3,6 +3,6 @@ import puzzles
 
 if __name__ == "__main__":
 	sudoku = SudokuGrid(puzzles.SKIENA_HARD)
-	# invalid = SudokuGrid(puzzles.INVALID)
+	sudoku.pretty_print()
 	sudoku.solve()
-	# sudoku.pretty_print()
+	sudoku.pretty_print()
