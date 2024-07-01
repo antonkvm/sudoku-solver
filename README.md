@@ -8,13 +8,13 @@ Currently the app implements the following heuristics:
 
 - simple row, column, and 3x3 subgrid inconsistency check
 - Minumum Remaining Values (MRV):
-  - prefer the cells with the fewest remaining candidates (i.e. the most constrained cells), reducing the chance of picking a wrong value
+  - prefer to select one of the cells with the fewest remaning candidates (i.e. most constrained), reducing the chance of picking a wrong value
 - Constraint Propagation:
   - entering a value into a cell removes that value from the candidate sets of connected cells
   - boosts effectiveness of MRV
 - Look-Ahead Candidate Selection:
   - skip a candidate for a cell if choosing that value would cause another cell to be left with no candidates through constraint propagation
-  - a cell with no candidates is a definite indication that a partial solution is wrong, meaning that branch can be pruned
+  - causing a cell to be left with no candidates is a definitive indication that a partial solution is wrong, meaning that branch can be pruned
   - Propably nullified by MRV, see explanation [here](#conflicting-heuristics).
 - Least Constraining Value (LCV)
   - prefer the candidate for a cell that impacts the fewest candidate sets of other connected cells through constraint propagation, reducing the chance of eliminating a correct candidate
@@ -29,15 +29,13 @@ The app currently solves these puzzles (from `puzzles.py`) with this performace:
 - difficult1: 2279 steps for 58 empty cells
 - difficult2: 76 steps for 47 empty cells
 - notfun: 3330 steps for 62 empty cells
-- skiena_hard: 8522 for 64 empty cells
+- skiena_hard: 8522 steps for 64 empty cells
 
 > A step is defined as entering a value into a cell and then moving on to the next cell.
 
-Notice that for the easy puzzles, the algorithm never made a single wrong choice for a cell and never had to backtrack.
-
 ## Heuristic trade-off
 
-The performance generally improved when I added new heuristics and optimizations, but interestingly, adding the Least Constraining Value Heuristic resulted in both better and worse performace, depending on the input puzzle. This shows that implementing a new heuristic is not a guaranteed improvement for every input, but rather just increases the chance of improvement.
+The performance generally improved when I added new heuristics and optimizations, but interestingly, adding the Least Constraining Value (LCV) Heuristic resulted in both better and worse performace, depending on the input puzzle. This shows that implementing a new heuristic is not a guaranteed improvement for every input, but rather just increases the chance of improvement. Kind of like different sorting algorithms have different performances for different inputs.
 
 | Optimization                | intermediate | difficult2 | notfun | skiena_hard |
 |-----------------------------|:------------:|:----------:|:------:|:-----------:|
@@ -57,7 +55,7 @@ Look-Ahead Candidate Selection skips a candidate for a cell (A), if choosing it 
 
 ## A different approach?
 
-Backtracking is – while definitely effective – a somewhat 'dumb' way of solving a sudoku puzzle, because it's basically just trial and error with some optimizations. Because most puzzles are solveable by humans, their solution can be deduced by repeatedly eliminating cell candidates using different techniques (like hidden pairs, pointing pairs, etc) until we find an definite solution for every cell. This is a more elegant approach, which is why I think it would be smart to implement these constraint propagation methods for eliminating candidates as a primary solving agent, while demoting the brute-force backtracking appraoch to a fallback method, for when candidate elimination hits a dead end.
+Backtracking is – while definitely effective – a somewhat 'dumb' way of solving a sudoku puzzle, because it's basically just trial and error with some optimizations. Because most puzzles are solveable by humans, their solution can be deduced by repeatedly eliminating cell candidates using different techniques (like hidden pairs, pointing pairs, etc) until we find an definite solution for every cell. This is a more elegant approach, which is why I think it would be smart to implement these constraint propagation methods for eliminating candidates as a primary solving agent, while demoting the brute-force backtracking appraoch to be a fallback method, for when candidate elimination hits a dead end.
 
 ## Resources
 
