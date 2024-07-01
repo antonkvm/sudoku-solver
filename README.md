@@ -1,6 +1,21 @@
 # Sudoku solver
 
-This application solves a given Sudoku puzzle using backtracking.
+This application solves a given Sudoku puzzle using backtracking and heuristics. I made this as a little personal challenge and because I play Sudoku on my phone a lot.
+
+## Usage
+
+~~~Python
+from sudoku import SudokuGrid
+import puzzles
+
+# create new grid object from puzzle input:
+s = SudokuGrid(puzzles.EASY)
+s.pretty_print()
+
+# solve it:
+s.solve()
+s.pretty_print()
+~~~
 
 ## Implemented Heuristics
 
