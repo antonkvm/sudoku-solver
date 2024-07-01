@@ -25,7 +25,7 @@ The app currently solves these puzzles (from `puzzles.py`) with this performace:
 
 - easy1: 45 steps for 45 empty cells
 - easy2: 45 steps for 45 empty cells
-- intermediate: 834 steps for 57 empty cells 
+- intermediate: 834 steps for 57 empty cells
 - difficult1: 2279 steps for 58 empty cells
 - difficult2: 76 steps for 47 empty cells
 - notfun: 3330 steps for 62 empty cells
@@ -46,7 +46,7 @@ The performance generally improved when I added new heuristics and optimizations
 
 ## Puzzle sources
 
-- Fong, S., _Example Puzzles and Solutions_. Sudoku Sandiway. Retrieved September 18, 2023, from https://sandiway.arizona.edu/sudoku/examples.html
+- Fong, S., _Example Puzzles and Solutions_. Sudoku Sandiway. Retrieved September 18, 2023, from <https://sandiway.arizona.edu/sudoku/examples.html>
 - Skiena, S. S. (2008). _The Algorithm Design Manual._ Springer Science & Business Media, 2 edition.
 
 ## Conflicting Heuristics
@@ -62,5 +62,5 @@ Backtracking is – while definitely effective – a somewhat 'dumb' way of solv
 ## Resources
 
 - Blankertz, B. & Röhr, V., _Algorithmen und Datenstrukturen: Vorlesungsskript_. TU Berlin, Fachgebiet Neurotechnologie.
-- Fong, S., _Heuristics_. Sudoku Sandiway. Retrieved September 16, 2023, from https://sandiway.arizona.edu/sudoku/index.html#heuristics
+- Fong, S., _Heuristics_. Sudoku Sandiway. Retrieved September 16, 2023, from <https://sandiway.arizona.edu/sudoku/index.html#heuristics>
 - Skiena, S. S. (2008). _The Algorithm Design Manual_. Springer Science & Business Media, 2 edition.
