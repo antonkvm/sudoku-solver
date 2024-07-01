@@ -67,19 +67,19 @@ class SudokuGrid:
         print('Checking grid validity in terms of sudoku rules...')
 
         for i in range(9):
-            row = self.grid[i]
-            col = [row[i] for row in self.grid]
-            subgrid = []
+            row_vals = self.grid[i]
+            col_vals = [row[i] for row in self.grid]
+            subgrid_vals = []
             for j in range(9):
-                row = (i // 3 * 3) + (j // 3)
-                col = (i % 3 * 3) + (j % 3)
-                subgrid.append(self.grid[row][col])
+                sg_row = (i // 3 * 3) + (j // 3)
+                sg_col = (i % 3 * 3) + (j % 3)
+                subgrid_vals.append(self.grid[sg_row][sg_col])
 
-            if has_duplicates(row):
+            if has_duplicates(row_vals):
                 raise ValueError(f'Grid is invalid because row {i+1} (from the top) has a duplicate.')
-            if has_duplicates(col):
+            if has_duplicates(col_vals):
                 raise ValueError(f'Grid is invalid because column {i+1} (from the left) has a duplicate.')
-            if has_duplicates(subgrid):
+            if has_duplicates(subgrid_vals):
                 raise ValueError(f'Grid is invalid because subgrid {i+1} () has a duplicate.')
 
         print('Grid is valid.')
