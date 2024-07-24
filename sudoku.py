@@ -12,60 +12,59 @@ def has_duplicates(cells: list[Cell]) -> bool:
 
 
 class SudokuGrid:
-    def __init__(self, input: str) -> None:
+    def __init__(self, input: list[list[int]]) -> None:
         self.verify_input(input)
-        self.grid = self.build_grid(input)
-        self.validate_grid()
-        self.calculate_all_candidates()
+        self.grid = self.make_cells(input)
+        self.verify_rules()
+        self.populate_candidate_sets()
         self.steps = 0
-        print('Init complete.\n')
 
-    def print(self) -> str:
-        """Prints the grid in a single line string."""
-        string = ''
-        for row in self.grid:
-            for cell in row:
-                string += str(cell.val)
-        print(string)
+    def __str__(self) -> str:
+        s = ''
+        h_div = ('+' + '-' * 7) * 3 + '+'
+        for i, row in enumerate(self.grid):
+            if i % 3 == 0:
+                s += h_div + '\n'
+            row_vals = [cell.val if cell.val != 0 else ' ' for cell in row]
+            row_str = ''
+            for j, val in enumerate(row_vals):
+                if j % 3 == 0:
+                    row_str += '|'
+                row_str += str(val)
+            row_str += '|'
+            row_str = ' '.join(row_str)
+            s += row_str + '\n'
+        s += h_div
+        return s
 
-    def pretty_print(self) -> None:
-        """Prints the grid in a pretty way."""
-        pretty = ''
-        for i in range(9):
-            for j in range(9):
-                cell = self.grid[i][j].val
-                if cell != 0:
-                    pretty += str(cell)
-                else:
-                    pretty += '.'
-                if j != 8:
-                    pretty += ' '
-                else:
-                    pretty += '\n'
-                if j == 2 or j == 5:
-                    pretty += '| '
-            if i == 2 or i == 5:
-                pretty += '------|-------|------\n'
-        print(pretty)
+    def verify_input(self, input):
+        if not isinstance(input, list):
+            raise TypeError(f'Input should be of type list but is of type {type(input)}')
+        if len(input) != 9:
+            raise ValueError(f'Input list should contain 9 elements but actually contains {len(input)}.')
+        for sublist in input:
+            if not isinstance(sublist, list):
+                raise TypeError(f'Input should be a list of lists but contains an element of type {type(sublist)}.')
+            if len(sublist) != 9:
+                raise ValueError(f'Input sublists should be of length 9 but but actually is of length {len(sublist)}.')
+            for item in sublist:
+                if not isinstance(item, int):
+                    raise TypeError(f'All elements of sublists should integers, but found one of type {type(item)}.')
 
-    def verify_input(self, input: str):
-        """Raises an error if the input string is invalid in terms of type, length, or if it has non-digit elements."""
-        print('Verifying input...')
-        if input is None:
-            raise TypeError('Missing mandatory parameter: input string')
-        elif not isinstance(input, str):
-            raise TypeError(f'Input should be of type string, but is of type {type(input)}.')
-        elif len(input) != 81:
-            raise ValueError(f'Input string should have length 81, but has length {len(input)}.')
-        elif not input.isdigit():
-            raise ValueError('Input string should only contain digits.')
-        else:
-            print('All checks passed.')
+    def make_cells(self, input: list[list[int]]) -> list[list[Cell]]:
+        """Convert the list of lists of integers to a list of lists of Cell objects."""
+        grid = []
+        for i, row in enumerate(input):
+            grid_row = []
+            for j, val in enumerate(row):
+                cell = Cell(val, row=i, col=j)
+                grid_row.append(cell)
+            grid.append(grid_row)
+        return grid
 
-    def validate_grid(self):
-        """Raises an error if the grid is invalid in terms of the sudoku rules."""
-        print('Checking grid validity in terms of sudoku rules...')
-
+    def verify_rules(self):
+        """Raise an error if the puzzle grid breaks a sudoku rule."""
+        # Loop 9 times, verifying one row, column and subgrid in each loop:
         for i in range(9):
             row_vals = self.grid[i]
             col_vals = [row[i] for row in self.grid]
@@ -74,7 +73,6 @@ class SudokuGrid:
                 sg_row = (i // 3 * 3) + (j // 3)
                 sg_col = (i % 3 * 3) + (j % 3)
                 subgrid_vals.append(self.grid[sg_row][sg_col])
-
             if has_duplicates(row_vals):
                 raise ValueError(f'Grid is invalid because row {i+1} (from the top) has a duplicate.')
             if has_duplicates(col_vals):
@@ -82,53 +80,20 @@ class SudokuGrid:
             if has_duplicates(subgrid_vals):
                 raise ValueError(f'Grid is invalid because subgrid {i+1} () has a duplicate.')
 
-        print('Grid is valid.')
-
-    # TODO: having this grid and also storing the row/col in the cell object is kinda redundant.
-    def build_grid(self, input: str) -> list[list[Cell]]:
-        print('Building sudoku puzzle grid from input...')
-        puzzle: list[list[Cell]] = []
-        for i in range(0, len(input), 9):
-            row: list[Cell] = []
-            for j in range(i, i + 9):
-                row.append(Cell(val=int(input[j]), row=i // 9, col=j % 9))
-            puzzle.append(row)
-        print('Build successful.')
-        return puzzle
-
-    def calculate_all_candidates(self):
+    def populate_candidate_sets(self):
         """Fills in the candidates for all empty cells."""
-        print('Filling in candidates for all empty cells...')
-        for row in range(9):
-            for col in range(9):
-                cell = self.grid[row][col]
+        for row in self.grid:
+            for cell in row:
                 if cell.val == 0:
-                    candidates = self.find_candidates(row, col)
+                    candidates = self.find_candidates(cell)
                     cell.candidates.update(candidates)
-        print('Done.')
 
-    def find_candidates(self, row: int, col: int) -> set[int]:
-        """Returns a set of candidates for a given cell."""
+    def find_candidates(self, cell: Cell) -> set[int]:
         candidates = set(range(1, 10))
-        cell = self.grid[row][col]
         cells = self.get_connected_cells(cell)
         for c in cells:
             candidates.discard(c.val)
         return candidates
-
-    def find_empty_cell(self) -> Cell | None:
-        """Returns the first empty cell with the smallest, non-empty candidate set. Will return None if none are found."""
-        cell_with_fewest_candidates = None
-        lowest_candidate_count = 10
-        for row in range(9):
-            for col in range(9):
-                cell = self.grid[row][col]
-                if cell.val == 0:
-                    cell_candidate_count = len(cell.candidates)
-                    if cell_candidate_count < lowest_candidate_count and cell_candidate_count > 0:
-                        cell_with_fewest_candidates = cell
-                        lowest_candidate_count = cell_candidate_count
-        return cell_with_fewest_candidates
 
     def get_connected_cells(self, cell: Cell) -> set[Cell]:
         """Returns a set of all connected cells, empty or not."""
@@ -143,45 +108,43 @@ class SudokuGrid:
         for r in range(sector_start_row, sector_start_row + 3):
             for c in range(sector_start_col, sector_start_col + 3):
                 cells.add(self.grid[r][c])
-        cells.remove(cell)
+        cells.remove(cell)  # remove self
         return cells
 
-    def get_connected_empty_cells(self, cell: Cell) -> set[Cell]:
-        """Returns a set containing all connected empty cells. Connected means in the same row, column, or 3x3 subgrid."""
-        cells = self.get_connected_cells(cell)
-        cells = filter(lambda cell: cell.val == 0, cells)
-        return set(cells)
+    def get_most_constrained_cell(self) -> Cell | None:
+        """Return the cell with the smallest candidate set."""
+        empty_cells = [cell for row in self.grid for cell in row if cell.val == 0]
+        sorted_cells = sorted(empty_cells, key=lambda cell: len(cell.candidates))
+        return sorted_cells[0]
 
     def get_propagation_targets(self, cell: Cell, candidate: int) -> set[Cell]:
-        """Returns a set of empty cells that are connected to the passed cell and have the passed candidate in their candidate set."""
-        connected = self.get_connected_empty_cells(cell)
-        return set(filter(lambda cell: candidate in cell.candidates, connected))
+        """Return the set of empty cells connected to `cell` that have `candidate` in their candidate set."""
+        connected = self.get_connected_cells(cell)
+        return {cell for cell in connected if cell.val == 0 and candidate in cell.candidates}  # set comprehension
 
     def solution_found(self) -> True:
-        """Returns True if the grid contains no empty cells and no sudoku rules are broken."""
+        """Return True if the grid contains no empty cells and no sudoku rules are broken."""
         for row in self.grid:
             for cell in row:
                 if cell.val == 0:
                     return False
         print('Solution found.')
-        self.validate_grid()
+        self.verify_rules()
         print(f'Took {self.steps} steps.')
         return True
 
-    def sort_candidates(self, cell: Cell) -> list[int]:
-        """Returns a list of candidate integers that is sorted by the number of cells that would have their candidate sets affected through constraint propagation if that candidate is chosen. In other words, the first candidate in the returned list is the candidate that will affect the fewest other cell candidate sets. Used for LCV heuristic."""
-        candidates = cell.candidates
-        candidates = list(candidates)
-        candidates.sort(key=lambda c: len(self.get_propagation_targets(cell, c)))
-        return candidates
+    def sort_candidates_by_propagation_impact(self, cell: Cell) -> list[int]:
+        """
+        Return the candidates of the passed cell as a list sorted by the number of other empty cells that would have
+        their candidate set affected if that candidate was chosen.
+        """
+        candidates = list(cell.candidates)
+        return sorted(candidates, key=lambda candidate: len(self.get_propagation_targets(cell, candidate)))
 
     def backtrack(self):
-        # exit condition:
-        if not self.solution_found():
-            # select most constrained cell with (Minimum Remaining Value):
-            target_cell = self.find_empty_cell()
-            # sort candidates by impact on other cells (Least Constraining Value):
-            sorted_candidates = self.sort_candidates(target_cell)
+        if not self.solution_found():  # exit condition
+            target_cell = self.get_most_constrained_cell()
+            sorted_candidates = self.sort_candidates_by_propagation_impact(target_cell)
             for c in sorted_candidates:
                 propagation_targets = self.get_propagation_targets(target_cell, c)
                 # look-ahead candidate selection:
@@ -201,8 +164,7 @@ class SudokuGrid:
                 for pt in propagation_targets:
                     pt.candidates.add(c)
         else:
-            # solution found:
-            return True
+            return True  # solution found
 
     def solve(self):
         print('Solving puzzle...')

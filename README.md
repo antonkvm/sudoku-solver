@@ -1,6 +1,6 @@
 # Sudoku solver
 
-This application solves a given Sudoku puzzle using backtracking and heuristics. I made this as a little personal challenge and because I play Sudoku on my phone a lot.
+Solve a given Sudoku puzzle using backtracking and heuristics. I made this as a little personal challenge and because I play Sudoku on my phone a lot.
 
 ## Usage
 
@@ -8,31 +8,53 @@ This application solves a given Sudoku puzzle using backtracking and heuristics.
 from sudoku import SudokuGrid
 import puzzles
 
-# create new grid object from puzzle input:
-s = SudokuGrid(puzzles.EASY)
-s.pretty_print()
+# define a puzzle input:
+grid_1 = [
+    [0, 0, 0, 2, 6, 0, 7, 0, 1],
+    [6, 8, 0, 0, 7, 0, 0, 9, 0],
+    [1, 9, 0, 0, 0, 4, 5, 0, 0],
+    [8, 2, 0, 1, 0, 0, 0, 4, 0],
+    [0, 0, 4, 6, 0, 2, 9, 0, 0],
+    [0, 5, 0, 0, 0, 3, 0, 2, 8],
+    [0, 0, 9, 3, 0, 0, 0, 7, 4],
+    [0, 4, 0, 0, 5, 0, 0, 3, 6],
+    [7, 0, 3, 0, 1, 8, 0, 0, 0],
+]
+
+# or choose a predefined one:
+grid_2 = puzzles.NOTFUN
+
+# create a new SudokuGrid object from the puzzle input:
+puzzle = SudokuGrid(grid_1)
+
+# show unsolved puzzle:
+print(puzzle)
 
 # solve it:
-s.solve()
-s.pretty_print()
+puzzle.solve()
+
+# show solved puzzle:
+print(puzzle)
 ~~~
 
 ## Implemented Heuristics
 
-Currently the app implements the following heuristics:
+Currently these heuristics are implemented:
 
-- simple row, column, and 3x3 subgrid inconsistency check
+- Simple row, column, and 3x3 subgrid inconsistency check:
+  - not much of a heuristic but whatever.
 - Minumum Remaining Values (MRV):
-  - prefer to select one of the cells with the fewest remaning candidates (i.e. most constrained), reducing the chance of picking a wrong value
+  - prefer trying a value for the cell with the fewest remaining candidates (i.e. most constrained)
+  - a smaller candidate set to choose from reduces the chance of picking a wrong value
 - Constraint Propagation:
   - entering a value into a cell removes that value from the candidate sets of connected cells
-  - boosts effectiveness of MRV
+  - boosts effectiveness of MRV because we continuously reduce the size of candidate sets
 - Look-Ahead Candidate Selection:
-  - skip a candidate for a cell if choosing that value would cause another cell to be left with no candidates through constraint propagation
-  - causing a cell to be left with no candidates is a definitive indication that a partial solution is wrong, meaning that branch can be pruned
-  - Propably nullified by MRV, see explanation [here](#conflicting-heuristics).
+  - skip a candidate if choosing it would mean another cell has no valid canidate left through constraint propagation
+  - effecting an empty candidate set means that backtracking branch is hopeless, so we can prune it
 - Least Constraining Value (LCV)
-  - prefer the candidate for a cell that impacts the fewest candidate sets of other connected cells through constraint propagation, reducing the chance of eliminating a correct candidate
+  - prefer the candidate for a cell that impacts the fewest other candidate sets
+  - reduces the chance of eliminating a correct candidate
 
 ## Performance
 
@@ -50,7 +72,7 @@ The app currently solves these puzzles (from `puzzles.py`) with this performace:
 
 ## Heuristic trade-off
 
-The performance generally improved when I added new heuristics and optimizations, but interestingly, adding the Least Constraining Value (LCV) Heuristic resulted in both better and worse performace, depending on the input puzzle. This shows that implementing a new heuristic is not a guaranteed improvement for every input, but rather just increases the chance of improvement. Kind of like different sorting algorithms have different performances for different inputs.
+The performance generally improved when I added new heuristics and optimizations, but interestingly, adding the Least Constraining Value (LCV) Heuristic resulted in both better and worse performace, depending on the input puzzle. This shows that implementing a new heuristic is not a guaranteed improvement for every input, but rather just increases the chance of improvement.
 
 | Optimization                | intermediate | difficult2 | notfun | skiena_hard |
 |-----------------------------|:------------:|:----------:|:------:|:-----------:|
@@ -61,16 +83,6 @@ The performance generally improved when I added new heuristics and optimizations
 
 - Fong, S., _Example Puzzles and Solutions_. Sudoku Sandiway. Retrieved September 18, 2023, from <https://sandiway.arizona.edu/sudoku/examples.html>
 - Skiena, S. S. (2008). _The Algorithm Design Manual._ Springer Science & Business Media, 2 edition.
-
-## Conflicting Heuristics
-
-I would argue that the MRV heuristic nullifies any effect the Look-Ahead Candidated Selection heuristic would have, for the following reason:
-
-Look-Ahead Candidate Selection skips a candidate for a cell (A), if choosing it would cause a seperate cell (B) to be left with no candidates, because there is no way that a solution can be found for that case. But in this scenario, cell A has more candidates than cell B — meaning MRV would have selected cell B before cell A anyway and Look-Ahead Candidate Selection would never take effect.
-
-## A different approach?
-
-Backtracking is – while definitely effective – a somewhat 'dumb' way of solving a sudoku puzzle, because it's basically just trial and error with some optimizations. Because most puzzles are solveable by humans, their solution can be deduced by repeatedly eliminating cell candidates using different techniques (like hidden pairs, pointing pairs, etc) until we find an definite solution for every cell. This is a more elegant approach, which is why I think it would be smart to implement these constraint propagation methods for eliminating candidates as a primary solving agent, while demoting the brute-force backtracking appraoch to be a fallback method, for when candidate elimination hits a dead end.
 
 ## Resources
 
