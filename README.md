@@ -85,7 +85,7 @@ The performance generally improved when I added new heuristics and optimizations
 
 ## Is backtracking dumb?
 
-While totally effective, backtracking is really just brainless trial and error until we're lucky enough to stumble upon a valid solution. Adding heuristics into the mix makes it somewhat more intentional, but at it's core it's still a brute-force approach. In theory, a monkey could do this (given enough time and bananas), and to me that begs the questions wether it's more elegant to first go through all the nifty tricks that exist to eliminate candidates for a cell, like pointing pairs, X-Wing or even super nerdy stuff like Swordfish, before eventually using backtracking only as a fallback.
+While totally effective, backtracking is really just mindless trial and error until we're lucky enough to stumble upon a valid solution. Adding heuristics into the mix makes it somewhat more intentional, but at it's core it's still a brute-force approach. To me that begs the questions wether it's more elegant to first go through all the cool tricks that exist to eliminate candidates for a cell (like pointing pairs, X-Wing, Swordfish, etc.), before eventually using backtracking only as a fallback.
 
 ## Puzzle sources
 
