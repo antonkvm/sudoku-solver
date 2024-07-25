@@ -1,6 +1,6 @@
 # Sudoku solver
 
-Solve a given Sudoku puzzle using backtracking and heuristics. I made this as a little personal challenge and because I play Sudoku on my phone a lot.
+Solve a Sudoku puzzle using backtracking and heuristics. I made this as a little personal challenge and because I play Sudoku on my phone a lot.
 
 ## Usage
 
@@ -39,10 +39,10 @@ print(puzzle)
 
 ## Implemented Heuristics
 
-Currently these heuristics are implemented:
+The program would work fine with just plain backtracking and the performance improvement is probably in the milliseconds, but I wanted to see how low I could push the number of backtracking steps by implementing these heuristics:
 
 - Simple row, column, and 3x3 subgrid inconsistency check:
-  - not much of a heuristic but whatever.
+  - I can technically call this a heuristic because I check it at every step, not just at the end
 - Minumum Remaining Values (MRV):
   - prefer trying a value for the cell with the fewest remaining candidates (i.e. most constrained)
   - a smaller candidate set to choose from reduces the chance of picking a wrong value
@@ -58,7 +58,7 @@ Currently these heuristics are implemented:
 
 ## Performance
 
-The app currently solves these puzzles (from `puzzles.py`) with this performace:
+The program currently solves these puzzles (from `puzzles.py`) with this performace:
 
 - easy1: 45 steps for 45 empty cells
 - easy2: 45 steps for 45 empty cells
@@ -68,21 +68,30 @@ The app currently solves these puzzles (from `puzzles.py`) with this performace:
 - notfun: 3330 steps for 62 empty cells
 - skiena_hard: 8522 steps for 64 empty cells
 
-> A step is defined as entering a value into a cell and then moving on to the next cell.
+> A step is defined as trying out a value for a cell during backtracking.
+
+## Solutions are not always deterministic
+
+Many Sudoku puzzles have one valid solution, but counterintuitively, as puzzles get harder because they have less pre-filled cells, the number of valid solutions increase. Think of how a puzzle with only one pre-filled cell would be extremely easy to solve, because for most cells you can enter whatever you want. That is why some puzzles that are considered to be the most challenging have more pre-filled cells than 'easier' ones.
 
 ## Heuristic trade-off
 
-The performance generally improved when I added new heuristics and optimizations, but interestingly, adding the Least Constraining Value (LCV) Heuristic resulted in both better and worse performace, depending on the input puzzle. This shows that implementing a new heuristic is not a guaranteed improvement for every input, but rather just increases the chance of improvement.
+The performance generally improved when I added new heuristics and optimizations, but interestingly, adding the Least Constraining Value (LCV) Heuristic resulted in both better and worse performace, depending on the input puzzle. This demonstrates that implementing heuristics does not guarantee improved performance for every input, it just increases the chance of better performance.
 
 | Optimization                | intermediate | difficult2 | notfun | skiena_hard |
 |-----------------------------|:------------:|:----------:|:------:|:-----------:|
 | Before adding LCV heuristic |      384     |     113    |  1230  |    27211    |
 | After adding LCV heuristic  |      834     |     76     |  3330  |     8522    |
 
+## Is backtracking dumb?
+
+While totally effective, backtracking is really just brainless trial and error until we're lucky enough to stumble upon a valid solution. Adding heuristics into the mix makes it somewhat more intentional, but at it's core it's still a brute-force approach. In theory, a monkey could do this (given enough time and bananas), and to me that begs the questions wether it's more elegant to first go through all the nifty tricks that exist to eliminate candidates for a cell, like pointing pairs, X-Wing or even super nerdy stuff like Swordfish, before eventually using backtracking only as a fallback.
+
 ## Puzzle sources
 
-- Fong, S., _Example Puzzles and Solutions_. Sudoku Sandiway. Retrieved September 18, 2023, from <https://sandiway.arizona.edu/sudoku/examples.html>
-- Skiena, S. S. (2008). _The Algorithm Design Manual._ Springer Science & Business Media, 2 edition.
+- SKIENA: Skiena, S. S. (2008). _The Algorithm Design Manual._ Springer Science & Business Media, 2 edition.
+- INKALA: Dr. Arto Inkala
+- All other: Fong, S., _Example Puzzles and Solutions_. Sudoku Sandiway. Retrieved September 18, 2023, from <https://sandiway.arizona.edu/sudoku/examples.html>
 
 ## Resources
 
