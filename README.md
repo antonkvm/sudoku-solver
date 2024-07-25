@@ -72,7 +72,7 @@ The program currently solves these puzzles (from `puzzles.py`) with this perform
 
 ## Solutions are not always deterministic
 
-Many Sudoku puzzles have one valid solution, but counterintuitively, as puzzles get harder because they have less pre-filled cells, the number of valid solutions increase. Think of how a puzzle with only one pre-filled cell would be extremely easy to solve, because for most cells you can enter whatever you want. That is why some puzzles that are considered to be the most challenging have more pre-filled cells than 'easier' ones.
+Many Sudoku puzzles have one valid solution, but counterintuitively, as puzzles get harder by having less pre-filled cells, the number of valid solutions increases. Think of how a puzzle with only one pre-filled cell would be extremely easy to solve, because for most cells you can enter whatever you want. That is why some puzzles that are considered to be the most challenging have more pre-filled cells than 'easier' ones.
 
 ## Heuristic trade-off
 
